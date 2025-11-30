@@ -21,9 +21,3 @@ SnippetBar is a lightweight tool that keeps your most used text snippets always 
 3.  Open the folder and run **`SnippetBar.exe`**.
 
 > *Note: If Windows Defender shows a warning, click "More Info" -> "Run Anyway". This happens because the app is brand new and open source.*
-
-## 🎮 Controls
-
-*   **Left Click:** Paste/Copy snippet.
-*   **Right Click:** Edit snippets or manage categories.
-*   **Magnet Button (🧲):** Dock the bar to the screen edge.
