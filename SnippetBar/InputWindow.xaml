@@ -1,0 +1,35 @@
+﻿<Window x:Class="SnippetBar.InputWindow" Icon="app.ico"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ange namn" Height="180" Width="300"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#2D2D30" WindowStyle="None">
+
+    <!-- Snygg tunn ram runt fönstret -->
+    <Border BorderBrush="#555" BorderThickness="1">
+        <Grid Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Rubrik -->
+                <RowDefinition Height="*"/>
+                <!-- Textruta -->
+                <RowDefinition Height="Auto"/>
+                <!-- Knappar -->
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Ange namn" Foreground="White" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <TextBox x:Name="txtInput" Grid.Row="1" Height="30" VerticalAlignment="Top"
+                     Background="#444" Foreground="White" BorderThickness="0" Padding="5"
+                     CaretBrush="White"/>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="Avbryt" IsCancel="True" Width="70" Height="25" Margin="0,0,10,0"
+                        Background="#444" Foreground="White" BorderThickness="0"/>
+
+                <Button Content="OK" Click="Ok_Click" IsDefault="True" Width="70" Height="25"
+                        Background="#007ACC" Foreground="White" BorderThickness="0" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
