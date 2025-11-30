@@ -3,8 +3,8 @@
 **Your invisible clipboard assistant.**  
 SnippetBar is a lightweight tool that keeps your most used text snippets always within reach, without cluttering your screen.
 
-![SnippetBar Demo](demo.gif)
-*(Upload your GIF here to show the magnet/auto-hide feature)*
+![SnippetBar Demo]
+![Demo](https://github.com/user-attachments/assets/dfc43dc7-cc17-45be-b1b1-287f0e35bbb1)
 
 ## Key Features
 
