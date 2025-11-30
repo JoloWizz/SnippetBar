@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "SnippetBar.sln",
+    "projects": [
+      "SnippetBar\\SnippetBar.csproj"
+    ]
+  }
+}

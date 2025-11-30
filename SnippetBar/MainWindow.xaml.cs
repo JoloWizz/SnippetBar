@@ -68,16 +68,16 @@ namespace SnippetBar
             catch { _notifyIcon.Icon = System.Drawing.SystemIcons.Application; }
 
             _notifyIcon.Visible = true;
-            _notifyIcon.Text = "SnippetBar";
+            _notifyIcon.Text = LanguageManager.Instance["AppTitle"];
             _notifyIcon.DoubleClick += (s, e) => { this.Show(); this.WindowState = WindowState.Normal; this.Activate(); };
 
             var trayMenu = new System.Windows.Forms.ContextMenuStrip();
-            trayMenu.Items.Add("Öppna", null, (s, e) => { this.Show(); this.WindowState = WindowState.Normal; });
-            trayMenu.Items.Add("Avsluta", null, (s, e) => { _isRealExit = true; Application.Current.Shutdown(); });
+            trayMenu.Items.Add(LanguageManager.Instance["TrayOpen"], null, (s, e) => { this.Show(); this.WindowState = WindowState.Normal; });
+            trayMenu.Items.Add(LanguageManager.Instance["TrayExit"], null, (s, e) => { _isRealExit = true; Application.Current.Shutdown(); });
             _notifyIcon.ContextMenuStrip = trayMenu;
 
             LoadData();
-            LoadSettings();
+            LoadSettings(); // Här sätts även språket
 
             CategoryTabs.ItemsSource = Categories;
             this.MouseEnter += Window_MouseEnter;
@@ -93,16 +93,22 @@ namespace SnippetBar
             public double TransparencyLevel { get; set; } = 0.4;
             public bool IsAutoPasteMode { get; set; } = true;
             public bool IsAutoHideEnabled { get; set; } = false;
+            // ÄNDRING: Default till engelska
+            public string Language { get; set; } = "en";
         }
 
         // --- CLOSING & TRAY ---
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            // Om det inte är en "riktig" exit (via menyn), avbryt stängning och göm fönstret
             if (!_isRealExit)
             {
                 e.Cancel = true;
                 this.Hide();
-                _notifyIcon.ShowBalloonTip(1000, "SnippetBar", "Minimerad till system tray.", System.Windows.Forms.ToolTipIcon.Info);
+                _notifyIcon.ShowBalloonTip(1000,
+                    LanguageManager.Instance["AppTitle"],
+                    LanguageManager.Instance["MsgMinimized"],
+                    System.Windows.Forms.ToolTipIcon.Info);
             }
             else
             {
@@ -112,6 +118,7 @@ namespace SnippetBar
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
+            // Detta är "Avsluta" i menyn -> Stäng på riktigt
             _isRealExit = true;
             Application.Current.Shutdown();
         }
@@ -216,7 +223,7 @@ namespace SnippetBar
             if (!IsMouseOver) Window_MouseLeave(null!, null!);
         }
 
-        // --- LÄGESHANTERING ---
+        // --- SPRÅK & LÄGESHANTERING ---
         private void SetPasteMode_Click(object sender, RoutedEventArgs e)
         {
             _settings.IsAutoPasteMode = true;
@@ -231,9 +238,36 @@ namespace SnippetBar
             SaveSettings();
         }
 
+        private void SetLanguageSv_Click(object sender, RoutedEventArgs e) => SetLanguage("sv");
+        private void SetLanguageEn_Click(object sender, RoutedEventArgs e) => SetLanguage("en");
+
+        private void SetLanguage(string lang)
+        {
+            _settings.Language = lang;
+            LanguageManager.Instance.SetLanguage(lang);
+            SaveSettings();
+            UpdateTrayMenuText();
+
+            // Uppdatera systemflikens namn direkt i UI
+            var sysCat = Categories.FirstOrDefault(c => c.IsSystemCategory);
+            if (sysCat != null)
+            {
+                sysCat.Name = LanguageManager.Instance["AllSnips"];
+                CategoryTabs.Items.Refresh();
+            }
+        }
+
+        private void UpdateTrayMenuText()
+        {
+            if (_notifyIcon != null && _notifyIcon.ContextMenuStrip != null)
+            {
+                _notifyIcon.ContextMenuStrip.Items[0].Text = LanguageManager.Instance["TrayOpen"];
+                _notifyIcon.ContextMenuStrip.Items[1].Text = LanguageManager.Instance["TrayExit"];
+            }
+        }
+
         private void UpdateModeMenuState()
         {
-            // Här refererar vi till de nya namnen i XAML: MenuModePaste och MenuModeCopy
             if (MenuModePaste != null && MenuModeCopy != null)
             {
                 MenuModePaste.IsChecked = _settings.IsAutoPasteMode;
@@ -320,6 +354,10 @@ namespace SnippetBar
                 }
                 catch { }
             }
+
+            // Sätt språk baserat på settings
+            LanguageManager.Instance.SetLanguage(_settings.Language);
+            UpdateTrayMenuText();
 
             if (chkTransparent != null) chkTransparent.IsChecked = _settings.EnableTransparency;
             if (txtOpacityInput != null) txtOpacityInput.Text = ((int)(_settings.TransparencyLevel * 100)).ToString();
@@ -446,7 +484,7 @@ namespace SnippetBar
             var allSnipsCat = Categories.FirstOrDefault(c => c.IsSystemCategory);
             if (allSnipsCat == null)
             {
-                allSnipsCat = new Category { Name = "Alla Snips", IsSystemCategory = true };
+                allSnipsCat = new Category { Name = LanguageManager.Instance["AllSnips"], IsSystemCategory = true };
                 Categories.Insert(0, allSnipsCat);
             }
             else
@@ -516,7 +554,7 @@ namespace SnippetBar
         {
             if (CategoryTabs.SelectedItem is Category category)
             {
-                if (category.IsSystemCategory) { MessageBox.Show("Du kan inte byta namn på 'Alla Snips'."); return; }
+                if (category.IsSystemCategory) { MessageBox.Show(LanguageManager.Instance["CannotRenameSystem"]); return; }
                 var input = new InputWindow(category.Name);
                 input.Owner = this;
                 if (input.ShowDialog() == true && !string.IsNullOrWhiteSpace(input.Answer))
@@ -532,8 +570,10 @@ namespace SnippetBar
         {
             if (CategoryTabs.SelectedItem is Category category)
             {
-                if (category.IsSystemCategory) { MessageBox.Show("Du kan inte ta bort 'Alla Snips'."); return; }
-                if (MessageBox.Show($"Ta bort fliken '{category.Name}'?", "Bekräfta", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (category.IsSystemCategory) { MessageBox.Show(LanguageManager.Instance["CannotDeleteSystem"]); return; }
+
+                string msg = string.Format(LanguageManager.Instance["ConfirmDeleteTab"], category.Name);
+                if (MessageBox.Show(msg, LanguageManager.Instance["Confirm"], MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     Categories.Remove(category);
                     SaveData();
@@ -582,7 +622,8 @@ namespace SnippetBar
         {
             if (sender is MenuItem menuItem && menuItem.Tag is Snippet snippet)
             {
-                if (MessageBox.Show($"Radera '{snippet.Title}' permanent?", "Radera", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                string msg = string.Format(LanguageManager.Instance["ConfirmDeleteSnip"], snippet.Title);
+                if (MessageBox.Show(msg, LanguageManager.Instance["Delete"], MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     foreach (var cat in Categories) if (cat.Snippets.Contains(snippet)) cat.Snippets.Remove(snippet);
                     SaveData();
@@ -607,7 +648,14 @@ namespace SnippetBar
             }
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e) { SaveData(); Application.Current.Shutdown(); }
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            SaveData();
+            // FIX: Använd Close() istället för Shutdown().
+            // Detta triggar Window_Closing, som kollar _isRealExit.
+            // Resultat: Appen minimeras istället för att dödas.
+            this.Close();
+        }
 
         private const int GWL_EXSTYLE = -20; private const int WS_EX_NOACTIVATE = 0x08000000;
         [DllImport("user32.dll")] public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -616,12 +664,8 @@ namespace SnippetBar
     }
 
     // --- DROP HANDLER (Sortering FIXAD) ---
-    // =========================================================
-    // DROP HANDLER (Nu med fungerande sortering!)
-    // =========================================================
     public class SnippetDropHandler : DefaultDropHandler
     {
-        // Hjälpmetod för att hitta fliken (används bara om vi inte är i en lista)
         private Category? GetTargetCategory(IDropInfo dropInfo)
         {
             if (dropInfo.TargetItem is Category c) return c;
@@ -637,26 +681,14 @@ namespace SnippetBar
 
         public override void DragOver(IDropInfo dropInfo)
         {
-            // FALL 1: Vi är över en lista (ItemsControl)
-            // Detta betyder att vi antingen sorterar eller drar in i listan
             if (dropInfo.TargetCollection != null)
             {
-                // Låt Gong sköta standard-grafiken (Strecket/Adornern)
                 base.DragOver(dropInfo);
-
-                // Justera bara effekten om vi drar mellan OLIKA listor
-                if (dropInfo.DragInfo.SourceCollection != dropInfo.TargetCollection)
-                {
-                    dropInfo.Effects = DragDropEffects.Copy;
-                }
-                else
-                {
-                    dropInfo.Effects = DragDropEffects.Move; // Samma lista = Flytta
-                }
+                if (dropInfo.DragInfo.SourceCollection != dropInfo.TargetCollection) dropInfo.Effects = DragDropEffects.Copy;
+                else dropInfo.Effects = DragDropEffects.Move;
                 return;
             }
 
-            // FALL 2: Vi är INTE över en lista, kolla om vi är på en Flik-rubrik
             var targetCat = GetTargetCategory(dropInfo);
             if (targetCat != null)
             {
@@ -667,7 +699,6 @@ namespace SnippetBar
 
         public override void Drop(IDropInfo dropInfo)
         {
-            // FALL 1: Drop i en Lista (Sortering eller Kopiering till lista)
             if (dropInfo.TargetCollection != null)
             {
                 var targetList = dropInfo.TargetCollection as ObservableCollection<Snippet>;
@@ -675,22 +706,15 @@ namespace SnippetBar
 
                 if (targetList != null && sourceList != null)
                 {
-                    // A) Samma lista = SORTERA (Använd Gongs inbyggda Move)
-                    if (targetList == sourceList)
-                    {
-                        base.Drop(dropInfo);
-                    }
-                    // B) Olika listor = KOPIERA
+                    if (targetList == sourceList) base.Drop(dropInfo);
                     else
                     {
                         var snippet = dropInfo.Data as Snippet;
                         if (snippet != null && !targetList.Contains(snippet))
                         {
-                            // Räkna ut var vi släppte den
                             int idx = dropInfo.InsertIndex;
                             if (idx < 0) idx = 0;
                             if (idx > targetList.Count) idx = targetList.Count;
-
                             targetList.Insert(idx, snippet);
                         }
                     }
@@ -698,7 +722,6 @@ namespace SnippetBar
                 return;
             }
 
-            // FALL 2: Drop på en Flik-rubrik (Alltid Kopiera)
             var targetCat = GetTargetCategory(dropInfo);
             if (targetCat != null)
             {

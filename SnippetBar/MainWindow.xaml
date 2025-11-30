@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:local="clr-namespace:SnippetBar"
-        Title="SnippetBar" Height="500" Width="300" 
+        Title="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[AppTitle]}" 
+        Height="500" Width="300" 
         Topmost="True" 
         WindowStyle="None" 
         ResizeMode="CanResize"
@@ -73,7 +74,8 @@
                         Width="30" Background="Transparent" Foreground="#AAA" BorderThickness="0"/>
 
                 <!-- TITEL -->
-                <TextBlock x:Name="txtAppTitle" Grid.Column="1" Text="SnippetBar" 
+                <TextBlock x:Name="txtAppTitle" Grid.Column="1" 
+                           Text="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[AppTitle]}" 
                            VerticalAlignment="Center" HorizontalAlignment="Center"
                            Foreground="#888" FontWeight="Bold" IsHitTestVisible="False"/>
 
@@ -83,30 +85,35 @@
                     <Button.ContextMenu>
                         <ContextMenu x:Name="MainMenu" Opened="Menu_Opened" Closed="Menu_Closed">
 
-                            <MenuItem Header="Ny Snip" Click="Add_Click" Icon="📝" FontWeight="Bold"/>
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuNewSnip]}" Click="Add_Click" Icon="📝" FontWeight="Bold"/>
                             <Separator/>
 
-                            <MenuItem Header="Kategori" Icon="📁">
-                                <MenuItem Header="Ny Kategori..." Click="NewCat_Click"/>
-                                <MenuItem Header="Byt namn..." Click="RenameActiveCat_Click"/>
-                                <MenuItem Header="Ta bort..." Click="DeleteActiveCat_Click"/>
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuCategory]}" Icon="📁">
+                                <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuNewCat]}" Click="NewCat_Click"/>
+                                <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuRenameCat]}" Click="RenameActiveCat_Click"/>
+                                <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuDeleteCat]}" Click="DeleteActiveCat_Click"/>
                             </MenuItem>
 
                             <Separator/>
 
-                            <!-- Notera namnen här: MenuModePaste och MenuModeCopy -->
-                            <MenuItem Header="Läge / Funktion" Icon="⚡">
-                                <MenuItem x:Name="MenuModePaste" Header="Klistra in direkt (Ctrl+V)" IsCheckable="True" Click="SetPasteMode_Click"/>
-                                <MenuItem x:Name="MenuModeCopy" Header="Endast till Urklipp" IsCheckable="True" Click="SetCopyMode_Click"/>
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuMode]}" Icon="⚡">
+                                <MenuItem x:Name="MenuModePaste" Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuPasteMode]}" IsCheckable="True" Click="SetPasteMode_Click"/>
+                                <MenuItem x:Name="MenuModeCopy" Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuCopyMode]}" IsCheckable="True" Click="SetCopyMode_Click"/>
                             </MenuItem>
 
-                            <MenuItem x:Name="MenuAutoHide" Header="Auto-göm vid dockning" IsCheckable="True" Click="ToggleAutoHide_Click"/>
+                            <MenuItem x:Name="MenuAutoHide" Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuAutoHide]}" IsCheckable="True" Click="ToggleAutoHide_Click"/>
 
                             <Separator/>
 
-                            <MenuItem Header="Inställningar" Click="ToggleSettings_Click" Icon="⚙️"/>
+                            <!-- SPRÅK MENY -->
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuLanguage]}" Icon="🌐">
+                                <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[LangSv]}" Click="SetLanguageSv_Click"/>
+                                <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[LangEn]}" Click="SetLanguageEn_Click"/>
+                            </MenuItem>
+
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuSettings]}" Click="ToggleSettings_Click" Icon="⚙️"/>
                             <Separator/>
-                            <MenuItem Header="Avsluta" Click="Exit_Click" Icon="✕" Foreground="#FF5555"/>
+                            <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuExit]}" Click="Exit_Click" Icon="✕" Foreground="#FF5555"/>
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
@@ -130,7 +137,10 @@
                                  Background="Transparent" Foreground="White" BorderThickness="0" 
                                  Height="24" VerticalContentAlignment="Center" FontSize="11"
                                  CaretBrush="White"/>
-                        <TextBlock Grid.Column="1" Text="Sök..." IsHitTestVisible="False" 
+                        <!-- Bunden Placeholder Text -->
+                        <TextBlock Grid.Column="1" 
+                                   Text="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[SearchPlaceholder]}" 
+                                   IsHitTestVisible="False" 
                                    VerticalAlignment="Center" Foreground="#555" FontSize="11"
                                    Visibility="{Binding ElementName=txtSearch, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     </Grid>
@@ -146,7 +156,7 @@
 
                 <TabControl.ContextMenu>
                     <ContextMenu Opened="Menu_Opened" Closed="Menu_Closed">
-                        <MenuItem Header="Ny Kategori" Click="NewCat_Click"/>
+                        <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuNewCat]}" Click="NewCat_Click"/>
                     </ContextMenu>
                 </TabControl.ContextMenu>
 
@@ -223,10 +233,10 @@
 
                             <ScrollViewer.ContextMenu>
                                 <ContextMenu Opened="Menu_Opened" Closed="Menu_Closed">
-                                    <MenuItem Header="Ny Snip" Click="Add_Click"/>
-                                    <MenuItem Header="Ny Kategori" Click="NewCat_Click"/>
+                                    <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuNewSnip]}" Click="Add_Click"/>
+                                    <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuNewCat]}" Click="NewCat_Click"/>
                                     <Separator/>
-                                    <MenuItem Header="Inställningar" Click="ToggleSettings_Click"/>
+                                    <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[MenuSettings]}" Click="ToggleSettings_Click"/>
                                 </ContextMenu>
                             </ScrollViewer.ContextMenu>
 
@@ -260,10 +270,10 @@
                                             </Button.Effect>
                                             <Button.ContextMenu>
                                                 <ContextMenu Opened="Menu_Opened" Closed="Menu_Closed">
-                                                    <MenuItem Header="Redigera" Click="Edit_Click" Tag="{Binding}"/>
+                                                    <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[CtxEdit]}" Click="Edit_Click" Tag="{Binding}"/>
                                                     <Separator/>
-                                                    <MenuItem x:Name="MenuRemoveFromCat" Header="Ta bort från Kategori" Click="RemoveFromCat_Click" Tag="{Binding}"/>
-                                                    <MenuItem Header="Radera PERMANENT" Click="DeletePermanent_Click" Tag="{Binding}" Foreground="#FF5555"/>
+                                                    <MenuItem x:Name="MenuRemoveFromCat" Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[CtxRemoveFromCat]}" Click="RemoveFromCat_Click" Tag="{Binding}"/>
+                                                    <MenuItem Header="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[CtxDeletePerm]}" Click="DeletePermanent_Click" Tag="{Binding}" Foreground="#FF5555"/>
                                                 </ContextMenu>
                                             </Button.ContextMenu>
                                             <Button.Resources>
@@ -284,14 +294,14 @@
             <Grid x:Name="SettingsOverlay" Grid.Row="1" Grid.RowSpan="3" Background="#F21E1E1E" Visibility="Collapsed" Margin="0,35,0,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10" VerticalAlignment="Top">
-                        <TextBlock Text="Inställningar" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[SettingsTitle]}" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" HorizontalAlignment="Center"/>
 
-                        <TextBlock Text="Transparens" Foreground="#AAA" FontSize="11" Margin="0,0,0,2"/>
-                        <CheckBox x:Name="chkTransparent" Content="Aktiv" 
+                        <TextBlock Text="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[LblTransparency]}" Foreground="#AAA" FontSize="11" Margin="0,0,0,2"/>
+                        <CheckBox x:Name="chkTransparent" Content="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[ChkActive]}" 
                                   IsChecked="True" Foreground="White" FontSize="11" Margin="0,0,0,8"
                                   Checked="Settings_Changed" Unchecked="Settings_Changed"/>
 
-                        <TextBlock Text="Opacitet (%)" Foreground="#AAA" FontSize="11" Margin="0,0,0,2"/>
+                        <TextBlock Text="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[LblOpacity]}" Foreground="#AAA" FontSize="11" Margin="0,0,0,2"/>
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -308,7 +318,7 @@
                         </Grid>
 
                         <Separator Background="#444" Margin="0,0,0,15"/>
-                        <Button Content="Stäng" Click="ToggleSettings_Click" Padding="5" Background="#007ACC" Foreground="White" BorderThickness="0"/>
+                        <Button Content="{Binding Source={x:Static local:LanguageManager.Instance}, Path=[BtnClose]}" Click="ToggleSettings_Click" Padding="5" Background="#007ACC" Foreground="White" BorderThickness="0"/>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
