@@ -10,6 +10,7 @@ SnippetBar is a lightweight tool that keeps your most used text snippets always 
 
 *   **Magnet Docking:** Snaps to the edge of your screen.
 *   **Auto-Hide:** Stays out of your way until you hover over it.
+*   **Multi-language:** Switch between English 🇺🇸 and Swedish 🇸🇪
 *   **Drag & Drop:** Organize snippets into categories easily.
 *   **Smart Paste:** Click to paste directly (⚡) or copy to clipboard (📋).
 *   **Search:** Find what you need instantly.
@@ -25,6 +26,5 @@ SnippetBar is a lightweight tool that keeps your most used text snippets always 
 ## 🎮 Controls
 
 *   **Left Click:** Paste/Copy snippet.
-*   **Shift + Click:** Toggle between Paste/Copy mode temporarily.
 *   **Right Click:** Edit snippets or manage categories.
 *   **Magnet Button (🧲):** Dock the bar to the screen edge.
