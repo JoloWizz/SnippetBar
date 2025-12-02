@@ -1,4 +1,4 @@
-# SnippetBar 🧲                                               [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jolowizz)
+# SnippetBar 🧲                                         [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jolowizz)
 
 **Your invisible clipboard assistant.**  
 SnippetBar is a lightweight tool that keeps your most used text snippets always within reach, without cluttering your screen.
